@@ -18,7 +18,7 @@ written in pure C.
      ``docker pull infinitytechnology/infinity-os-gcc-cross-x86_64-elf``
 - 3º The image will appear in the Container Image list
 
-    ![contaier_list](docs/docker/InfinityOS.png)
+    ![contaier_list](docs/docker/screenshot1.png)
 
 ### Build and Run Instructions
 
