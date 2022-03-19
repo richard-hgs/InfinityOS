@@ -27,6 +27,24 @@ written in pure C.
 - 5º The configuration screen will poup. Click in Expand button.
 
     ![screenshot3](docs/docker/screenshot3.png)
+    
+- 6º Put the following values in the fields:
+    - Container Name: 
+        
+           infinityos-buildenv 
+        
+    - Container Path: 
+ 
+           /user/local
+        
+    - Host Path: C:\InfinityOS_Project_Folder_Path
+    - OBS: Don't change the Container Name/Path beacause of internal automation to fast start, build and run kernel;
+
+      Host Path: Is the path to your project folder downloaded.
+      
+      After all configuration click in "Run" button.
+
+    ![screenshot4](docs/docker/screenshot4.png)
 
 ### Build and Run Instructions
 
