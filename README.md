@@ -44,7 +44,12 @@ written in pure C.
       
       After all configuration click in "Run" button.
 
-    ![screenshot4](docs/docker/screenshot4.png)
+  ![screenshot4](docs/docker/screenshot4.png)
+    
+- 7º Stop the execution of the created container app by clicking in "Stop" button.
+  OBS: This step is required because of internal automation to fast start, build and run kernel;
+  
+  ![screenshot5](docs/docker/screenshot5.png)
 
 ### Build and Run Instructions
 
