@@ -18,7 +18,15 @@ written in pure C.
      ``docker pull infinitytechnology/infinity-os-gcc-cross-x86_64-elf``
 - 3º The image will appear in the Container Image list
 
-    ![contaier_list](docs/docker/screenshot1.png)
+    ![screenshot1](docs/docker/screenshot1.png)
+    
+- 4º Move the mouse over the "infinitytechnology/infinity-os-gcc-cross-x86_64-elf" container image and click in run button
+
+    ![screenshot2](docs/docker/screenshot2.png)
+    
+- 5º The configuration screen will poup. Click in Expand button.
+
+    ![screenshot3](docs/docker/screenshot3.png)
 
 ### Build and Run Instructions
 
