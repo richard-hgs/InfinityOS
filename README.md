@@ -11,8 +11,18 @@ written in pure C.
 ### Screen Shots (Only posting 3 at once)
 
 
+### Configuring Development Environment
+- 1º Install Docker and make the first steps in Doker main page: https://www.docker.com/products/docker-desktop/;
+- 2º Pull the container-image:
+     
+     ``docker pull infinitytechnology/infinity-os-gcc-cross-x86_64-elf``
+- 3º The image will appear in the Container Image list
+
+    ![contaier_list](docs/docker/InfinityOS.png)
+
 ### Build and Run Instructions
 
  - Configuring the development workspace.
 
  - How to compile?
+    - Run the: compile-and-run.bat
