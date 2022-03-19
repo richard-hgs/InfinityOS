@@ -31,11 +31,11 @@ written in pure C.
 - 6º Put the following values in the fields:
     - Container Name: 
         
-           infinityos-buildenv 
+          infinityos-buildenv 
         
     - Container Path: 
  
-           /user/local
+          /user/local
         
     - Host Path: C:\InfinityOS_Project_Folder_Path
     - OBS: Don't change the Container Name/Path beacause of internal automation to fast start, build and run kernel;
