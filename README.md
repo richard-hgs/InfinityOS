@@ -13,8 +13,6 @@ written in pure C.
 
 ### Build and Run Instructions
 
- - Install required tools for Debian based distros below.
-
-		sudo apt install -y build-essential gcc-multilib nasm qemu-system wodim
+ - Configuring the development workspace.
 
  - How to compile?
