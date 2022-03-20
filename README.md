@@ -43,7 +43,7 @@ written in pure C.
           /user/local
         
     - Host Path: C:\InfinityOS_Project_Folder_Path
-    - OBS: Don't change the Container Name/Path beacause of internal automation to fast start, build and run kernel;
+    - OBS: Don't change the Container Name/Path because of internal automation to fast start, build and run kernel;
 
       Host Path: Is the path to your project folder downloaded.
       
