@@ -8,11 +8,13 @@ am doing this small project to learn even more, after all knowledge is power. Th
 project will show you how to write a two stage boot loader written in NASM (Net-wide Assembler), also with a simple kernel
 written in pure C.
 
-### Screen Shots (Only posting 3 at once)
+### Screen Shots  
+![screenshot1](docs/os/screenshot7.png)
 
 
-### Configuring Development Environment - WINDOWS
-- 1º Install Docker and make the first steps in Doker main page: https://www.docker.com/products/docker-desktop/;
+### Configuring Development Workspace/Environment - WINDOWS / VSCode
+- 1º Install Docker and make the first steps in Doker main page;
+  [Download and Install Docker Desktop](https://www.docker.com/products/docker-desktop/)
 - 2º Build the container image:
      - Open a terminal in project folder and run the following command:
      <br/>
@@ -54,9 +56,27 @@ written in pure C.
   
   ![screenshot5](docs/docker/screenshot5.png)
 
-### Build and Run Instructions
+- 8º Optional - If you are using VSCode, In root project folder go to .vscode/c_cpp_properties.json
+    - Change the "compilerPath" to your cygwin path to provide context for library importations and autocomplete.
 
- - Configuring the development workspace.
+      Example: "compilerPath": "C:/cygwin64/bin/gcc.exe"
 
- - How to compile?
-    - Run the: compile-and-run.bat
+- 9º QEMU - To test the compiled operating system we will need a virtual machine. [Download and Install QEMU](https://www.qemu.org/download/)
+
+- 10º If you did everything right the compilation process and test will work at first try.
+
+### Build and Run
+
+- 1º VSCode: If you are using VSCode you can run the build task using the keyboard shortcut: `CTRL+SHIFT+B`.
+
+   The bootloader and kernel will compile, after that the qemu will try to open the compiled kernel under build folder, and operating system should be running by now inside QEMU.
+
+- 2º To sign In type `root` and press enter.
+
+
+### Throubleshots
+
+- If the kernel don't compile, maybe the docker container is already running, if so this error message will appear in terminal. To fix open the container docker in system tray menu and stop the `infinityos-buildenv` container app. Then build again.
+
+- If the kernel don't compile maybe the problem can be the It is auto generated file `docker-container-id` if so delete this file and stop container if already running. Then build again.
+

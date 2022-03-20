@@ -163,7 +163,7 @@ int kprint_type(short type, const char *format, va_list ap) {
 				}
 			}
 
-			dskprintf("%c\r\n", format[amount]);
+			// dskprintf("%c\r\n", format[amount]);
 			// If custom format passed fix the format
 			if (format[amount] && format[amount] == '%') {
 				if (format[amount + 1] && format[amount + 1] == '0') {

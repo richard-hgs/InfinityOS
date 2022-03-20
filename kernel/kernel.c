@@ -158,6 +158,7 @@ void kernel_main() {
 		if(login_active) {
 			if(!strcmp("root", key_buffer)) {
 				login_active = false;
+				vga_clear_screen();
 				kprintf("Login successful!\n");
 				// sleep(2);
 				kprintf("Please type 'help' for a list of commands.\n> ");

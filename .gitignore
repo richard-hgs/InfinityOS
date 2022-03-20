@@ -8,3 +8,4 @@ imgwrite/imgwrite
 imagefs/imagefs
 prsfs/prsfs
 tags
+docker-container-id.txt
