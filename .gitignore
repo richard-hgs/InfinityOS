@@ -1,0 +1,10 @@
+*.o
+*.bin
+*.elf
+*.bak
+*.img
+build
+imgwrite/imgwrite
+imagefs/imagefs
+prsfs/prsfs
+tags
