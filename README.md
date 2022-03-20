@@ -1,6 +1,8 @@
 # InfinityOS
 InfinityOS - Simplest Operating System Kernel
 
+- 🍵 If you like my work [buy me a coffe](https://www.buymeacoffee.com/richardgs) 🍵
+
 ## Small Two Stage Bootloader and C Kernel
 
 I know a lot about 16 real mode and boot sectors but not everything about it. I
