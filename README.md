@@ -11,11 +11,14 @@ written in pure C.
 ### Screen Shots (Only posting 3 at once)
 
 
-### Configuring Development Environment
+### Configuring Development Environment - WINDOWS
 - 1º Install Docker and make the first steps in Doker main page: https://www.docker.com/products/docker-desktop/;
-- 2º Pull the container-image:
+- 2º Build the container image:
+     - Open a terminal in project folder and run the following command:
+     <br/>
      
-     ``docker pull infinitytechnology/infinity-os-gcc-cross-x86_64-elf``
+      docker build -t infinitytechnology/infinity-os-gcc-cross-x86_64-elf -f DockerFile .
+     
 - 3º The image will appear in the Container Image list
 
     ![screenshot1](docs/docker/screenshot1.png)
