@@ -27,6 +27,11 @@
 
 #define isascii(c) ((unsigned)(c) <= 0x7F)
 #define MAXBUF 100
+#define DEBUG_ON false
+
+#define DEBUG_COMMANDS_LENGTH 2
+int currentDebugCommand = 0;
+char DEBUG_COMMANDS_TO_RUN[DEBUG_COMMANDS_LENGTH][MAXBUF] = {"root\0", "kprintf_usage\0"};
 
 bool kbd_istyping;
 bool login_active;
@@ -87,7 +92,6 @@ void get_command(char *buf, int size)
 		}
 		buf[i] = '\0';
 }
-
 
 /* Entry point for kernel.
  */
@@ -152,7 +156,16 @@ void kernel_main() {
 	// kprintf("Timer Ticks: %u - MAX: %u\n", get_timer_ticks(), UINT64_MAX);
 
 	while(true) {
-		get_command(key_buffer, sizeof(key_buffer));
+		if (DEBUG_ON && DEBUG_COMMANDS_LENGTH > 0 && currentDebugCommand < DEBUG_COMMANDS_LENGTH) {
+			kbd_istyping = true;
+			char* strDebugCmd = DEBUG_COMMANDS_TO_RUN[currentDebugCommand];
+			currentDebugCommand++;
+
+			kprintf("%s\n", strDebugCmd);
+			memcpy(key_buffer, strDebugCmd, strlen(strDebugCmd) + 1);
+		} else {
+			get_command(key_buffer, sizeof(key_buffer));
+		}
 
 		// Handle login
 		if(login_active) {

@@ -58,6 +58,7 @@
         "k_malloc.h": "c",
         "serial_com.h": "c",
         "kernel.h": "c",
-        "file.h": "c"
+        "file.h": "c",
+        "kmalloc.h": "c"
     }
 }
