@@ -27,7 +27,7 @@
 
 #define isascii(c) ((unsigned)(c) <= 0x7F)
 #define MAXBUF 100
-#define DEBUG_ON false
+#define DEBUG_ON true
 
 #define DEBUG_COMMANDS_LENGTH 2
 int currentDebugCommand = 0;

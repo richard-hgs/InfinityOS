@@ -190,7 +190,7 @@ DEF_FNC(kprintf_usage) {
 	// char snPrintText[100];
 	// snprintf(snPrintText, 100, "%dmeu texto: %02d\0", 2, 2);
 
-	kprintf(" %02d - %02d\n", 2, 4);
+	// kprintf("%06d - %06d\n", 2, 4);
 
 	/* POINTER EXAMPLE */
 	// ptrdiff_t address = ((void*) myIntP) - NULL;

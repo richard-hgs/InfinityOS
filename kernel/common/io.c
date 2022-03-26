@@ -95,6 +95,10 @@ static int _dsprint(const char *str, unsigned int len) {
 	return 1;
 }
 
+static bool isCustomFormat(int written, const char *format) {
+	return (written == 0 && format[1] >= '0' && format[1] <= '9');
+}
+
 // void mitoa_s(int value, unsigned char radix, char *str, int size, char leadChar, int leadCount) {
 // 	// uint32_t strOffset = (uint32_t) str;
 // 	int written = itoa_s(value, radix, str, size);
@@ -152,7 +156,7 @@ int kprint_type(short type, const char *format, va_list ap) {
 
 		int addToWritten = 0;
 
-		if((written == 0 || leadingNumberCount == 0) && ((format[0] != '%') || format[1] == '%')) {
+		if((written == 0 || leadingNumberCount == 0) && ((format[0] != '%') || format[1] == '%' || isCustomFormat(written, format))) {
 			unsigned amount = 1;
 			if (written > 0) {
 				if(format[0] == '%') {
@@ -163,17 +167,25 @@ int kprint_type(short type, const char *format, va_list ap) {
 				}
 			}
 
+			// If custom format in first position matches the first position if don't 
+			// proceed with the default increment as next format
+			if (isCustomFormat(written, format)) {
+				amount = 0;
+			}
+
 			// dskprintf("%c\r\n", format[amount]);
+			
 			// If custom format passed fix the format
 			if (format[amount] && format[amount] == '%') {
-				if (format[amount + 1] && format[amount + 1] == '0') {
+				int addToFormatOffset = 1;
+				if (format[amount + addToFormatOffset] && format[amount + addToFormatOffset] == '0') {
 					leadingNumberChar = '0';
 					addToWritten++;
 
 					char strNum[2] = {'\0'};
 
-					while(format[amount + 1 + addToWritten] && format[amount + 1 + addToWritten] >= '0' && format[amount + 1 + addToWritten] <= '9') {
-						strNum[addToWritten - 1] = format[amount + 1 + addToWritten];
+					while(format[amount + addToFormatOffset + addToWritten] && format[amount + addToFormatOffset + addToWritten] >= '0' && format[amount + addToFormatOffset + addToWritten] <= '9') {
+						strNum[addToWritten - 1] = format[amount + addToFormatOffset + addToWritten];
 						leadingNumberCount = atoi(strNum);
 						addToWritten++;
 
