@@ -71,6 +71,8 @@ void memprintAsStr(uint32_t offset, uint32_t len, int vgaWidth);
 
 void memprintAsStr2(uint32_t offset, uint32_t len, int vgaWidth);
 
+void hexDump(const char * desc, const void * addr, const int len, int perLine);
+
 uint32_t probeRamSize();
 
 // static inline unsigned long _readl(unsigned long addr);

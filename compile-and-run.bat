@@ -65,11 +65,16 @@ If %DOCKER_BUILD_ERROR%==0 (
         echo,
     )
     echo INFO   -^> Running the qemu virtual machine...
+    
     REM Qemu release
     qemu-system-i386 -fda %OS_BIN_PATH% -boot a -s -soundhw pcspk
+
+    REM Qemu debug seriallog.log
     REM qemu-system-i386 -fda %OS_BIN_PATH% -boot a -s -soundhw pcspk -chardev stdio,id=char0,mux=on,logfile=serial.log,signal=off -serial chardev:char0 -mon chardev=char0
+    
     REM Qemu debugable
     REM qemu-system-i386 -fda %OS_BIN_PATH% -boot a -s -soundhw pcspk -S
+    
     REM Cygwin gdb
     REM gdb -ex "target remote localhost:1234" -ex "symbol-file build/kernel/kernel.elf" -ex "br *0x7e00"
     REM GDB - PRINT REGS: 
@@ -77,6 +82,7 @@ If %DOCKER_BUILD_ERROR%==0 (
     REM start cmd /k "cd 'D:\Programming\VSProjects\OperatingSystems\boot32-barebones-master' & qemu-system-i386 -fda floppy.img -boot a -soundhw pcspk -s -S"
     REM C:\cygwin64\bin\bash --login -c "cd D:/Programming/VSProjects/OperatingSystems/InfinityOS && gdb -ix "gdb_init_real_mode.txt" -ex "set tdesc filename target.xml" -ex "target remote localhost:1234" -ex "br *0x11eee" -ex "c""
     REM qemu-system-x86_64 -fda %OS_BIN_PATH%
+    
     REM Pendrive load
     REM qemu-system-i386 -fda \\.\PhysicalDrive2 -boot a -s -soundhw pcspk
     REM gdb -ex "target remote localhost:1234" -ex "symbol-file build/kernel/kernel.elf"

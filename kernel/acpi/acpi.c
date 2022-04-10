@@ -134,103 +134,37 @@ void acpi_locate_rsdp(int* revision, RSDPDescriptor_t* rsdp, RSDPDescriptor20_t*
     }
 }
 
-void hexDump (
-    const char * desc,
-    const void * addr,
-    const int len,
-    int perLine
-) {
-    // Silently ignore silly per-line values.
 
-    if (perLine < 4 || perLine > 64) { 
-        perLine = 16;
-    }
-
-    int i;
-    unsigned char buff[perLine+1];
-    const unsigned char * pc = (const unsigned char *)addr;
-
-    // Output description if given.
-
-    if (desc != NULL) kprintf ("%s:\n", desc);
-
-    // Length checks.
-
-    if (len == 0) {
-        kprintf("  ZERO LENGTH\n");
-        return;
-    }
-    if (len < 0) {
-        kprintf("  NEGATIVE LENGTH: %d\n", len);
-        return;
-    }
-
-    // Process every byte in the data.
-
-    for (i = 0; i < len; i++) {
-        // Multiple of perLine means new or first line (with line offset).
-
-        if ((i % perLine) == 0) {
-            // Only print previous-line ASCII buffer for lines beyond first.
-
-            if (i != 0) kprintf ("  %s\n", buff);
-
-            // Output the offset of current line.
-
-            kprintf ("  %04X ", i & 0xFFFF);
-        }
-
-        // Now the hex code for the specific character.
-
-        kprintf (" %02X", pc[i] & 0xFF);
-
-        // And buffer a printable ASCII character for later.
-
-        if ((pc[i] < 0x20) || (pc[i] > 0x7e)) // isprint() may be better.
-            buff[i % perLine] = '.';
-        else
-            buff[i % perLine] = pc[i];
-        buff[(i % perLine) + 1] = '\0';
-    }
-
-    // Pad out last line if not exactly perLine characters.
-
-    while ((i % perLine) != 0) {
-        kprintf ("   ");
-        i++;
-    }
-
-    // And print the final ASCII buffer.
-
-    kprintf ("  %s\n", buff);
-}
 
 void acpi_dump_definition_block(uint32_t startOffset, uint32_t size) {
+    // size = 100;
+
     // ACPI PAGE 1112;
     hexDump(0, (void*) startOffset, (int) size, 16);
-    // int leading = 0;
-    // for (size_t offset = startOffset; offset < startOffset + size; offset++) {
-    //     char amlChar = *((char*) offset);
-    //     int amlInt = (int) amlChar;
+    
+    int leading = 0;
+    for (size_t offset = startOffset; offset < startOffset + size; offset++) {
+        char amlChar = *((char*) offset);
+        int amlInt = (int) amlChar;
 
-    //     bool incrementLeading = false;
+        bool incrementLeading = false;
 
-    //     dskprintf("%x", amlInt & 0xFF);
+        // dskprintf("%02X ", amlInt & 0xFF);
 
-    //     // if (amlInt == 0x10) {
-    //     //     kprintf("%s", "DefinitionBlock\n");
-    //     //     // incrementLeading = true;
-    //     //     // leading += 2;
-    //     // } else if (amlInt == 0x08) {
-    //     //     kprintf("%s", "NameOp\n");
-    //     // } else {
+        // if (amlInt == 0x10) {
+        //     kprintf("%s", "DefinitionBlock\n");
+        //     // incrementLeading = true;
+        //     // leading += 2;
+        // } else if (amlInt == 0x08) {
+        //     kprintf("%s", "NameOp\n");
+        // } else {
 
-    //     // if (amlInt == 0) {
-    //     //     kprintf(".");
-    //     // } else {
-    //     //     kprintf("%c", amlChar);
-    //     // }
-    // }
+        // if (amlInt == 0) {
+        //     kprintf(".");
+        // } else {
+        //     kprintf("%c", amlChar);
+        // }
+    }
 }
 
 void acpi_locate_rsdt() {
@@ -327,7 +261,8 @@ void acpi_locate_rsdt() {
                         kprintf("DSDT - creatorid       : %u\n", dsdt->h.CreatorID);
                         kprintf("DSDT - creatorrevision : %u\n", dsdt->h.CreatorRevision);
 
-                        acpi_dump_definition_block(((uint32_t) dsdt) + sizeof(dsdt->h), 6009 - sizeof(dsdt->h));
+                        // acpi_dump_definition_block(((uint32_t) dsdt) + sizeof(dsdt->h), 6009 - sizeof(dsdt->h));
+                        acpi_dump_definition_block(((uint32_t) dsdt), 6009 + sizeof(dsdt->h));
 
                         // kprintf("dsdt memory 0x%x", (uint32_t) dsdt);
                         // for (uint32_t offset=((uint32_t) dsdt); offset < ((uint32_t) dsdt) + 100; offset++) {

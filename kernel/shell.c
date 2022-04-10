@@ -28,6 +28,7 @@
 #include "print.h"
 #include "checksum.h"
 #include "kheap.h"
+#include "kmalloc.h"
 #include "serial_com.h"
 
 /* Login active external variable */
@@ -56,18 +57,19 @@ typedef struct command {
 #define DEF_FNC(c) void cmd_ ##c(void)
 
 /* Prototypes for commands */
-DEF_FNC(clear);
-DEF_FNC(regs);
-DEF_FNC(acpidev);
-DEF_FNC(vgatest);
-DEF_FNC(serial_com_test);
-DEF_FNC(trowexception);
-DEF_FNC(kprintf_usage);
-DEF_FNC(memusage);
-DEF_FNC(logout);
-DEF_FNC(version);
-DEF_FNC(help);
-DEF_FNC(exit);
+DEF_FNC(clear);				// 0
+DEF_FNC(regs);				// 1
+DEF_FNC(acpidev);			// 2
+DEF_FNC(vgatest);			// 3
+DEF_FNC(serial_com_test);	// 4
+DEF_FNC(trowexception);		// 5
+DEF_FNC(kprintf_usage);		// 6
+DEF_FNC(memusage);			// 7
+DEF_FNC(memtest);			// 8
+DEF_FNC(logout);			// 9
+DEF_FNC(version);			// 10
+DEF_FNC(help);				// 11
+DEF_FNC(exit);				// 12
 
 /* ----------------------------- Commands -------------------------- */
 
@@ -80,6 +82,7 @@ ADD_CMD(serial_com_test, "Test serial communication"),
 ADD_CMD(trowexception, "Trow a exception"),
 ADD_CMD(kprintf_usage, "Show the kprintf usage examples"),
 ADD_CMD(memusage, "Show the memory usage"),
+ADD_CMD(memtest, "Test memory allocation"),
 ADD_CMD(logout, "Log out of the operating system."),
 ADD_CMD(version, "Displays the version information."),
 ADD_CMD(help, "Display this help text."),
@@ -188,9 +191,9 @@ DEF_FNC(kprintf_usage) {
 	);
 
 	// char snPrintText[100];
-	// snprintf(snPrintText, 100, "%dmeu texto: %02d\0", 2, 2);
+	// snprintf(snPrintText, 100, "%dmeu texto: %02d %02d %06d\0", 2, 2, 5, 20);
 
-	// kprintf("%06d - %06d\n", 2, 4);
+ 	// kprintf("%s\n", snPrintText);
 
 	/* POINTER EXAMPLE */
 	// ptrdiff_t address = ((void*) myIntP) - NULL;
@@ -207,6 +210,44 @@ DEF_FNC(kprintf_usage) {
 DEF_FNC(memusage) {
 	kprintf("HEAP   - blockCount: %i - alloc: %i - used: %i - malloc: %i - mused: %i\n", kheapMem.blockCount, kheapMem.heapSpaceAllocated, kheapMem.heapSpaceUsed, kheapMem.heapMemAllocated, kheapMem.heapMemUsed);
 	kprintf("KERNEL - mused: %i bytes - %i Kb\n", kheap_get_kernel_static_mem_usage(), kheap_get_kernel_static_mem_usage() / 1024);
+	kprintf("MEMORY SNAPSHOT:\n");
+
+	if (kheapMem.blockCount > 0) {
+		HeapMemBlock_t* currentBlock = 0;
+		size_t currentBlockAddress = 0;
+		size_t lastBlockAddress = (size_t) kheap_getMemBlockDataAddress(kheapMem.lastBlock);;
+		while(currentBlock == 0 || currentBlockAddress <= lastBlockAddress) {
+			if (currentBlock != 0) {
+				size_t size = (size_t) kheap_getMemBlockDataSize(currentBlock);
+				// First bit meory in use
+				kprintf("  OFFSET: %i - SIZE: %i - FLAGS: (%s)\n", currentBlockAddress, size, uint8_t_getbit(currentBlock->flags, 0) == 1 ? "IN_USE" : "FREE");
+				hexDump(0, (void*) currentBlockAddress, (int) size, 16);
+			}
+
+			if (currentBlock == 0) {
+				currentBlock = kheapMem.firstBlock;
+			} else {
+				currentBlock = currentBlock->nextBlock;
+			}
+			currentBlockAddress = (size_t) kheap_getMemBlockDataAddress(currentBlock);
+
+			// kprintf("CURRENT_BLOCK: %i - LAST_BLOCK: %i\n", currentBlockAddress, lastBlockAddress);
+		}
+	}
+	kprintf("MEMORY SNAPSHOT END\n\n");
+}
+
+DEF_FNC(memtest) {
+	int memusageOffset = 7;
+	commands[memusageOffset].func();
+	char* myStr1 = kmalloc(16);
+	memcpy(myStr1, "a1b2c3d4e5f6g7h8", 16);
+	commands[memusageOffset].func();
+	kfree(myStr1);
+	commands[memusageOffset].func();
+	char* myStr2 = kmalloc(16);
+	memcpy(myStr2, "a2b2c3d4e5f6g7h8", 16);
+	commands[memusageOffset].func();
 }
 
 /* Logout command, quit the shell and return to login screen.

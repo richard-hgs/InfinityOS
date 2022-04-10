@@ -31,7 +31,7 @@
 
 #define DEBUG_COMMANDS_LENGTH 2
 int currentDebugCommand = 0;
-char DEBUG_COMMANDS_TO_RUN[DEBUG_COMMANDS_LENGTH][MAXBUF] = {"root\0", "kprintf_usage\0"};
+char DEBUG_COMMANDS_TO_RUN[DEBUG_COMMANDS_LENGTH][MAXBUF] = {"root\0", "memtest\0"};
 
 bool kbd_istyping;
 bool login_active;

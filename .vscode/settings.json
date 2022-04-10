@@ -59,6 +59,8 @@
         "serial_com.h": "c",
         "kernel.h": "c",
         "file.h": "c",
-        "kmalloc.h": "c"
+        "kmalloc.h": "c",
+        "kheap.h": "c",
+        "checksum.h": "c"
     }
 }

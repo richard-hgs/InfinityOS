@@ -2,6 +2,10 @@
 #define _K_MALLOC_H_
 #pragma once
 
-void kmalloc_test();
+#include <stddef.h>
+
+void* kmalloc(size_t size);
+
+void kfree(void* memPtr);
 
 #endif

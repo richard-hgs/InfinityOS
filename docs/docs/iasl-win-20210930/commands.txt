@@ -1,0 +1,14 @@
+dump to .bin
+$ acpidump > acpidump.bin
+Extract to .dat
+$ acpixtract -a acpidump.bin
+Disassemble the binary table into human source
+$ iasl -d dsdt.dat   
+Compile ASL into AML. This often finds static source errors that were not found by the ASL compiler that was used by the BIOS writer
+$ iasl -sa DSDT.dsl    
+Run AML with user-space interpreter
+$ acpiexec DSDT.dat
+Generate 
+$ iasl.exe -e *.bin -fe refs.txt -d DSDT-mod.dsl
+Compile to aml
+$ iasl.exe DSDT-mod.dsl
