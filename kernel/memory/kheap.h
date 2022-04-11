@@ -23,7 +23,7 @@ void kheap_setBlockFlagBit(HeapMemBlock_t* block, uint8_t bitPos, bool bitVal);
 
 bool kheap_getBlockFlagBit(HeapMemBlock_t* block, uint8_t bitPos);
 
-void* kheap_addBlock(size_t blockSize, bool reuseFreeBlocks);
+void* kheap_addBlock(size_t size, bool reuseFreeBlocks, bool mergeFreeBlocks);
 
 void kheap_freeBlock(void* ptr);
 

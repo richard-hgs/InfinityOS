@@ -215,12 +215,12 @@ DEF_FNC(memusage) {
 	if (kheapMem.blockCount > 0) {
 		HeapMemBlock_t* currentBlock = 0;
 		size_t currentBlockAddress = 0;
-		size_t lastBlockAddress = (size_t) kheap_getMemBlockDataAddress(kheapMem.lastBlock);;
+		size_t lastBlockAddress = (size_t) kheap_getMemBlockDataAddress(kheapMem.lastBlock);
 		while(currentBlock == 0 || currentBlockAddress <= lastBlockAddress) {
 			if (currentBlock != 0) {
 				size_t size = (size_t) kheap_getMemBlockDataSize(currentBlock);
 				// First bit meory in use
-				kprintf("  OFFSET: %i - SIZE: %i - FLAGS: (%s)\n", currentBlockAddress, size, uint8_t_getbit(currentBlock->flags, 0) == 1 ? "IN_USE" : "FREE");
+				kprintf("  OFFSET: %i - MAX_OFFSET: %i - SIZE: %i - FLAGS: (%s)\n", currentBlockAddress, lastBlockAddress, size, uint8_t_getbit(currentBlock->flags, 0) == 1 ? "IN_USE" : "FREE");
 				hexDump(0, (void*) currentBlockAddress, (int) size, 16);
 			}
 
@@ -240,13 +240,19 @@ DEF_FNC(memusage) {
 DEF_FNC(memtest) {
 	int memusageOffset = 7;
 	commands[memusageOffset].func();
-	char* myStr1 = kmalloc(16);
-	memcpy(myStr1, "a1b2c3d4e5f6g7h8", 16);
+	char* myStr1 = kmalloc(8);
+	memcpy(myStr1, "abcdefgh", 8);
+	commands[memusageOffset].func();
+	// kfree(myStr1);
+	// commands[memusageOffset].func();
+	char* myStr2 = kmalloc(8);
+	memcpy(myStr2, "bcdefghi", 8);
 	commands[memusageOffset].func();
 	kfree(myStr1);
+	kfree(myStr2);
 	commands[memusageOffset].func();
-	char* myStr2 = kmalloc(16);
-	memcpy(myStr2, "a2b2c3d4e5f6g7h8", 16);
+	char* myStr3 = kmalloc(16);
+	memcpy(myStr3, "0123456789ABCDEF", 16);
 	commands[memusageOffset].func();
 }
 

@@ -43,20 +43,63 @@ bool kheap_getBlockFlagBit(HeapMemBlock_t* block, uint8_t bitPos) {
 }
 
 /**
- * @brief Search and return free block in the memory that can contain this allocated size or NULL if not found.
+ * @brief Search and return free block in the memory that can contain the size or NULL if not found.
  * 
+ * @param mergeFreeBlocks If a free block is found and its size is below required size and the preceding blocks
+ *                        are also free and the sum of all free blocks is >= required size than merge these blocks
  * @return HeapMemBlock_t* 
  */
-HeapMemBlock_t* kheap_searchNextFreeBlockSize(size_t size) {
+HeapMemBlock_t* kheap_searchNextFreeBlockSize(size_t size, bool mergeFreeBlocks) {
     if (kheapMem.blockCount == 0) {
         return NULL;
     }
     HeapMemBlock_t* currentBlock = kheapMem.firstBlock;
     size_t currentBlockAddress = (size_t) kheap_getMemBlockDataAddress(currentBlock);
     size_t lastBlockAddress = (size_t) kheap_getMemBlockDataAddress(kheapMem.lastBlock);
+    size_t currentBlockDataSize = 0;
+    bool currentBlockInUse = true;
     while(currentBlockAddress <= lastBlockAddress) {
-        if (kheap_getMemBlockDataSize(currentBlock) >= size && kheap_getBlockFlagBit(currentBlock, FLAG_IN_USE) == false) {
-            return currentBlock;
+        currentBlockDataSize = kheap_getMemBlockDataSize(currentBlock);
+        currentBlockInUse = kheap_getBlockFlagBit(currentBlock, FLAG_IN_USE);
+
+        if (currentBlockInUse == false) {
+            // Block is free to be used
+            if (currentBlockDataSize >= size) {
+                // Block has size to contain the requested allocated data size
+                return currentBlock;
+            } else if (mergeFreeBlocks) {
+                // Block don't has size to contain the requested allocated data size 
+                // Try to merge next free blocks preceding this block to make room for the data
+                // This method reduces compute time while prevent the iteration in entire memory to find a block that can holds the allocated data size.
+                HeapMemBlock_t* currentNextBlock = currentBlock;
+                size_t currentNextBlockAddress = currentBlockAddress;
+                size_t currentNextBlockDataSize = currentBlockDataSize;
+                size_t sizeOfAllFreeBlocks = currentBlockDataSize;
+                size_t countOfAllFreeMergeBlocks = 0;
+                bool currentNextBlockInUse = currentBlockInUse;
+                while(currentNextBlockAddress <= lastBlockAddress && sizeOfAllFreeBlocks < size && !currentNextBlockInUse) {
+                    currentNextBlock = currentNextBlock->nextBlock;
+                    currentNextBlockInUse = kheap_getBlockFlagBit(currentNextBlock, FLAG_IN_USE);
+                    currentNextBlockAddress = (size_t) kheap_getMemBlockDataAddress(currentNextBlock);
+                    currentNextBlockDataSize = kheap_getMemBlockDataSize(currentNextBlock);
+                    if (!currentNextBlockInUse) {
+                        countOfAllFreeMergeBlocks++;
+                        sizeOfAllFreeBlocks += currentNextBlockDataSize;
+                    }
+                }
+
+                if (sizeOfAllFreeBlocks >= size) {
+                    // Merged blocks can contain the requested allocated data size
+                    // Update current block to the block that precedes the last free merge block;
+                    currentBlock->nextBlock = currentNextBlock->nextBlock;
+                    // Update the memory totals removing the headers merged headers from the allocated totals
+                    kheapMem.blockCount -= countOfAllFreeMergeBlocks;
+                    if (currentNextBlockAddress == lastBlockAddress) {
+                        kheapMem.lastBlock = currentBlock;
+                    }
+                    return currentBlock;
+                }
+            }
         }
         currentBlock = currentBlock->nextBlock;
         currentBlockAddress = (size_t) kheap_getMemBlockDataAddress(currentBlock);
@@ -66,12 +109,16 @@ HeapMemBlock_t* kheap_searchNextFreeBlockSize(size_t size) {
 }
 
 /**
- * Add a new block to the current heap memory
- * @param blockSize         The size of the data to be allocated for this block
- * @param reuseFreeBlocks   true=Reuse free blocks if available, false=Create a new block
- * @return blockAddress     The address of the start memory location of this block
+ * Add a new block to the current heap memory.
+ * @param size         The size of the data to be allocated for this block.
+ * @param reuseFreeBlocks   true=Reuse free blocks if available, false=Create a new block.
+ * @param mergeFreeBlocks   true=If a free block is found and its size is below required size and the preceding blocks
+ *                          are also free and the sum of all free blocks is >= required size than merge these blocks.
+ *                          false=Disable merge functionality.
+ *                          OBS: Merge functionaly only works if reuseFreeBlocks=true.
+ * @return blockAddress     The address of the start memory location of this block.
  */
-void* kheap_addBlock(size_t blockSize, bool reuseFreeBlocks) {
+void* kheap_addBlock(size_t size, bool reuseFreeBlocks, bool mergeFreeBlocks) {
     bool isReuseBlock = false;
     HeapMemBlock_t* heapMemBlock = 0;
 
@@ -84,7 +131,7 @@ void* kheap_addBlock(size_t blockSize, bool reuseFreeBlocks) {
     // If reuse free blocks
     if (heapInitialized && reuseFreeBlocks) {
         // Search for a free block that can holds this data block size
-        HeapMemBlock_t* heapMemBlockReuse = kheap_searchNextFreeBlockSize(blockSize);
+        HeapMemBlock_t* heapMemBlockReuse = kheap_searchNextFreeBlockSize(size, true);
         if (heapMemBlockReuse != NULL) {
             heapMemBlock = heapMemBlockReuse;
             isReuseBlock = true;
@@ -93,7 +140,7 @@ void* kheap_addBlock(size_t blockSize, bool reuseFreeBlocks) {
 
     if (!isReuseBlock) {
         // Create a reference to a next block to save the current block size and next block reference
-        heapMemBlock->nextBlock = (HeapMemBlock_t*)  (((int) (void*) heapMemBlock) + blockHeaderSize + blockSize + 1);
+        heapMemBlock->nextBlock = (HeapMemBlock_t*)  (((int) (void*) heapMemBlock) + blockHeaderSize + size + 1);
     }
 
     // Set first bit to 1=BLOCK_IN_USE
@@ -102,18 +149,24 @@ void* kheap_addBlock(size_t blockSize, bool reuseFreeBlocks) {
     if (!heapInitialized) {
         kheapMem.firstBlock = heapMemBlock;
         kheapMem.blockCount = 1;
-        kheapMem.heapSpaceAllocated = blockSize;
-        kheapMem.heapSpaceUsed = blockSize;
-        kheapMem.heapMemAllocated = blockHeaderSize + blockSize;
-        kheapMem.heapMemUsed = blockHeaderSize + blockSize;
+        kheapMem.heapSpaceAllocated = size;
+        kheapMem.heapSpaceUsed = size;
+        kheapMem.heapMemAllocated = blockHeaderSize + size;
+        kheapMem.heapMemUsed = blockHeaderSize + size;
         heapInitialized = true;
-    } else if (!isReuseBlock) {
-        // Increment this block size in memory totals
-        kheapMem.blockCount += 1;
-        kheapMem.heapSpaceAllocated += blockSize;
-        kheapMem.heapSpaceUsed += blockSize;
-        kheapMem.heapMemAllocated += blockHeaderSize + blockSize;
-        kheapMem.heapMemUsed += blockHeaderSize + blockSize;
+    } else {
+        if (!isReuseBlock) {
+            // Increment this block size in memory totals
+            kheapMem.blockCount += 1;
+            kheapMem.heapSpaceAllocated += size;
+            kheapMem.heapSpaceUsed += size;
+            kheapMem.heapMemAllocated += blockHeaderSize + size;
+            kheapMem.heapMemUsed += blockHeaderSize + size;
+        } else {
+            // Is reused block the header is already in the heapMemUsed increment only the allocated size
+            kheapMem.heapSpaceUsed += size;
+            kheapMem.heapMemUsed += size;
+        }
     }
     
     if (!isReuseBlock) {

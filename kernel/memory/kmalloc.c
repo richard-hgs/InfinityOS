@@ -8,7 +8,7 @@
 #include "kmalloc.h"
 
 void* kmalloc(size_t size) {
-    return kheap_addBlock(size, true);
+    return kheap_addBlock(size, true, true);
 }
 
 void kfree(void* memPtr) {
