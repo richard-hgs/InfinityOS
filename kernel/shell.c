@@ -254,6 +254,13 @@ DEF_FNC(memtest) {
 	char* myStr3 = kmalloc(16);
 	memcpy(myStr3, "0123456789ABCDEF", 16);
 	commands[memusageOffset].func();
+	kfree(myStr3);
+	commands[memusageOffset].func();
+	char* myStr4 = kmalloc(8);
+	memcpy(myStr4, "GHIJKLMN", 8);
+	commands[memusageOffset].func();
+	kfree(myStr4);
+	commands[memusageOffset].func();
 }
 
 /* Logout command, quit the shell and return to login screen.
